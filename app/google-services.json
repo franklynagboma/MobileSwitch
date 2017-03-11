@@ -1,0 +1,55 @@
+{
+  "project_info": {
+    "project_number": "664586350473",
+    "firebase_url": "https://mobileswitch-6ec4b.firebaseio.com",
+    "project_id": "mobileswitch-6ec4b",
+    "storage_bucket": "mobileswitch-6ec4b.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:664586350473:android:132a9d57f919f390",
+        "android_client_info": {
+          "package_name": "com.franklyn.mobileswitch"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "664586350473-hthpqp21521klfmllauvq0q9m1g8med4.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.franklyn.mobileswitch",
+            "certificate_hash": "D47ACCD3C31D4A2C337F10413648D79DE93EEC20"
+          }
+        },
+        {
+          "client_id": "664586350473-h11ln0bsdpgdrj501spmtjbf4g9nljh1.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCWaydSkCCZoC6EYLDMImjBsQwjdvwI1LQ"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "664586350473-h11ln0bsdpgdrj501spmtjbf4g9nljh1.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

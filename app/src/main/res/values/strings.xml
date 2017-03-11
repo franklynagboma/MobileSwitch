@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">MobileSwitch</string>
+    <string name="connection">No internet connection</string>
+</resources>

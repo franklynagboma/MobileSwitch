@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#B79659</color>
+    <color name="colorPrimaryDark">#7d6539</color>
+    <color name="colorAccent">#FF4081</color>
+
+    <color name="background">#80B79659</color>
+    <color name="view">#40000000</color>
+    <color name="white_card">#EDEDED</color>
+    <color name="button_off">#40BDBDBD</color>
+</resources>
