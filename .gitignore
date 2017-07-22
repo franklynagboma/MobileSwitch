@@ -1,6 +1,8 @@
 *.iml
 /local.properties
 /.idea/*
+*.bat
+gradlew
 .DS_Store
 /build
 /captures
