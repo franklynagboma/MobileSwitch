@@ -18,6 +18,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -43,14 +45,17 @@ import java.util.Calendar;
 public class MobileSwitchActivity extends AppCompatActivity implements View.OnClickListener{
 
     private final String DEVICE_NAME = Build.MANUFACTURER + "  "+ Build.MODEL;
-    private final String LOG_TAG = MobileSwitchActivity.class.getSimpleName();
+    private final static String LOG_TAG = MobileSwitchActivity.class.getSimpleName();
 
     private Button buttonOn, buttonOff;
     private ImageView wifiButton, switchMenu;
+    private static WebView webView;
+    private static String getUrl;
+    private static String getUrlLoaded = "";
     private int getCurrentState;
 
     private boolean connectionEnabled;
-    private ProgressDialog stateLoadingDialog;
+    public static ProgressDialog stateLoadingDialog;
     //private int brownColor = R.color.colorPrimaryDark, whiteColor = R.color.button_off;
     private Drawable brownDrawable, whiteDrawable;
 
@@ -84,10 +89,18 @@ public class MobileSwitchActivity extends AppCompatActivity implements View.OnCl
     private void init() {
 
         //object views
+        /**
+         * The buttons are inverted
+         * That is, the On sends off which is then receive by
+         * FireBase as '0' the passed to Esp8266 and then Arduino
+         * which send the state to the relay but since the
+         * relay works like and inverter, it turns the relay on
+         */
         switchMenu = (ImageView) findViewById(R.id.switch_menu);
         buttonOn = (Button) findViewById(R.id.button_on);
         buttonOff = (Button) findViewById(R.id.button_off);
         wifiButton = (ImageView) findViewById(R.id.wifi_button);
+        webView = (WebView) findViewById(R.id.web_view);
 
 
         //set onclick listener
@@ -107,6 +120,7 @@ public class MobileSwitchActivity extends AppCompatActivity implements View.OnCl
                 .child(AppController.SWITCH_LIST_DATABASE);
 
     }
+
 
     @Override
     public void onClick(View view) {
@@ -202,6 +216,15 @@ public class MobileSwitchActivity extends AppCompatActivity implements View.OnCl
     protected void onResume() {
         super.onResume();
 
+
+        /**
+         * Load view offline
+         * This allows offline communication
+         */
+        webView.loadUrl("http://192.168.4.1");
+        webView.setWebViewClient(new LoadView());
+
+        //set button enable false for all
         setButtonEnable(buttonOn, false);
         setButtonEnable(buttonOff, false);
         setButtonColor(buttonOn, whiteDrawable);
@@ -225,6 +248,11 @@ public class MobileSwitchActivity extends AppCompatActivity implements View.OnCl
 
     }
 
+    @Override
+    public void onBackPressed() {
+        webView.loadUrl("http://192.168.4.1");
+        webView.setWebViewClient(new LoadView());
+    }
 
     @Override
     protected void onPause() {
@@ -275,7 +303,7 @@ public class MobileSwitchActivity extends AppCompatActivity implements View.OnCl
 
     }
 
-    private void progressDialog(String message) {
+    public static void progressDialog(String message) {
 
         Log.e(LOG_TAG, "In progress dialog");
 
@@ -312,7 +340,7 @@ public class MobileSwitchActivity extends AppCompatActivity implements View.OnCl
         int min = calendar.get(Calendar.MINUTE);
         int seconds = calendar.get(Calendar.SECOND);
 
-        String timeStamp = "" + hour + "H-" + min + "M-" + seconds + "s";
+        String timeStamp = "" + hour + "H " + min + "M " + seconds + "s";
         Log.e(LOG_TAG, "Time stamp " + timeStamp);
 
         //check condtion for on/off then set string of respective state
@@ -328,7 +356,6 @@ public class MobileSwitchActivity extends AppCompatActivity implements View.OnCl
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
-                if(stateLoadingDialog.isShowing())
                     stateLoadingDialog.dismiss();
             }
         }, 2000);
@@ -337,7 +364,7 @@ public class MobileSwitchActivity extends AppCompatActivity implements View.OnCl
     private void getSwitchStateFromCloud() {
 
         //call loading dialog
-        progressDialog("Loading switch state");
+        //progressDialog("Loading switch state");
         getCurrentState = -1;
         loadState();
     }
@@ -383,7 +410,7 @@ public class MobileSwitchActivity extends AppCompatActivity implements View.OnCl
                         setButtonEnable(buttonOff, true);
                     }
 
-                    new Handler().postDelayed(new Runnable() {
+                    /*new Handler().postDelayed(new Runnable() {
                         @Override
                         public void run() {
                             //stop loading dialog
@@ -391,7 +418,7 @@ public class MobileSwitchActivity extends AppCompatActivity implements View.OnCl
                             if(stateLoadingDialog.isShowing())
                                 stateLoadingDialog.dismiss();
                         }
-                    }, 1000);
+                    }, 1000);*/
                 }
 
                 @Override
@@ -403,7 +430,7 @@ public class MobileSwitchActivity extends AppCompatActivity implements View.OnCl
 
     }
 
-    private class ConnectionDialogTask extends AsyncTask<Void, Void, Void> {
+    /*private class ConnectionDialogTask extends AsyncTask<Void, Void, Void> {
 
         private String LOG_TAG = ConnectionDialogTask.class.getSimpleName();
 
@@ -431,6 +458,49 @@ public class MobileSwitchActivity extends AppCompatActivity implements View.OnCl
                 }); checkConnection.start();
             }
             return null;
+        }
+    }*/
+
+    public static void goBack() {
+        webView.goBack();
+    }
+
+    public static void saveUrl(String url) {
+
+        if(getUrlLoaded.isEmpty() || url.isEmpty())
+            getUrlLoaded = url;
+
+    }
+
+    public static String getSaveUrl() {
+        return getUrlLoaded;
+    }
+
+    public static class LoadView extends WebViewClient {
+
+        public static WebView web;
+        public static String url;
+
+
+        private void load() {
+            web.loadUrl(url);
+            stateLoadingDialog.dismiss();
+        }
+
+
+        public static String getUrl() {
+            return web.getUrl();
+        }
+
+        @Override
+        public boolean shouldOverrideUrlLoading(WebView view, String mUrl) {
+            MobileSwitchActivity.progressDialog("Sending state...");
+            MobileSwitchActivity.saveUrl(mUrl);
+
+            web = view;
+            url = mUrl;
+            load();
+            return true;
         }
     }
 }
